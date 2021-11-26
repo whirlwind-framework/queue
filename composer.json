@@ -1,0 +1,36 @@
+{
+    "name": "whirlwind-framework/queue",
+    "description": "Whirlwind framework queue library",
+    "keywords": [
+        "queue amqp rabbitmq"
+    ],
+    "authors": [
+        {
+            "name": "Alexander Stepanenko",
+            "email": "alex.stepanenko@gmail.com"
+        }
+    ],
+    "type": "library",
+    "license": "BSD-3-Clause",
+    "minimum-stability": "dev",
+    "require": {
+        "php": "~7.4",
+        "ext-json": "*",
+        "whirlwind-framework/framework": "*",
+        "php-amqplib/php-amqplib": "~2.0"
+    },
+    "require-dev": {
+        "dg/bypass-finals": "^1.2",
+        "phpunit/phpunit": "^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Whirlwind\\Queue\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Test\\": "tests"
+        }
+    }
+}
