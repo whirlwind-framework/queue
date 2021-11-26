@@ -74,7 +74,7 @@ class AmqpConnection
     {
         $index = $channelId ?: 'default';
         if (!\array_key_exists($index, $this->channels)) {
-            $this->channels[$index] = $this->connection->channel($channelId);
+            $this->channels[$index] = $this->getConnection()->channel($channelId);
         }
         return $this->channels[$index];
     }
