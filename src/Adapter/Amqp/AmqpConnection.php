@@ -43,7 +43,7 @@ class AmqpConnection
      * @param string $vhost
      */
     public function __construct(
-        string $host  = '127.0.0.1',
+        string $host = '127.0.0.1',
         int $port = 5672,
         string $user = '',
         string $password = '',
@@ -86,5 +86,4 @@ class AmqpConnection
         }
         $this->getChannel($channelId)->basic_publish($message, $exchange, $routingKey);
     }
-
 }
