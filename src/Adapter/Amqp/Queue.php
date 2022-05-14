@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Whirlwind\Queue\Adapter\Amqp;
 
+use InvalidArgumentException;
 use Whirlwind\Queue\MessageInterface;
 use Whirlwind\Queue\QueueInterface;
 
@@ -30,6 +31,9 @@ class Queue implements QueueInterface
 
     public function push(MessageInterface $message)
     {
+        if (!($message instanceof AmqpMessage)) {
+            throw new InvalidArgumentException('Message must be of AmqpMessage type');
+        }
         $this->amqpConnection->send(
             $this->exchange,
             $this->routingKey,
