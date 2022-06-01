@@ -4,9 +4,19 @@ declare(strict_types=1);
 
 namespace Whirlwind\Queue\Adapter\Amqp;
 
-use PhpAmqpLib\Channel\AMQPChannel;
+use InvalidArgumentException;
+use Whirlwind\Queue\MessageInterface;
+use Whirlwind\Queue\WorkerInterface;
 
-abstract class AmqpWorker
+abstract class AmqpWorker implements WorkerInterface
 {
-    abstract function consume(AmqpMessage $message, AMQPChannel $channel, $deliveryTag);
+    public function consume(MessageInterface $message)
+    {
+        if (!($message instanceof AmqpMessage)) {
+            throw new InvalidArgumentException('Message must be of AmqpMessage type');
+        }
+        $this->consumeInternal($message);
+    }
+
+    abstract protected function consumeInternal(AmqpMessage $message);
 }

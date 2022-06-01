@@ -7,4 +7,6 @@ namespace Whirlwind\Queue;
 interface QueueInterface
 {
     public function push(MessageInterface $message);
+
+    public function getName(): string;
 }

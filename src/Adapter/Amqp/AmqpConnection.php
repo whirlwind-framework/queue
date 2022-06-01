@@ -14,46 +14,35 @@ class AmqpConnection
     public const TYPE_HEADERS = 'headers';
     public const TYPE_FANOUT = 'fanout';
 
-    /**
-     * @var AMQPStreamConnection|null
-     */
-    protected $connection;
+    protected ?AMQPStreamConnection $connection;
 
     /**
      * @var AMQPChannel[]
      */
-    protected $channels = [];
+    protected array $channels = [];
 
-    protected $host;
+    protected string $host;
 
-    protected $port;
+    protected int $port;
 
-    protected $user;
+    protected string $user;
 
-    protected $password;
+    protected string $password;
 
-    protected $vhost;
+    protected string $vHost;
 
-    /**
-     * AmqpConnection constructor.
-     * @param string $host
-     * @param int $port
-     * @param $user
-     * @param $password
-     * @param string $vhost
-     */
     public function __construct(
         string $host = '127.0.0.1',
         int $port = 5672,
         string $user = '',
         string $password = '',
-        string $vhost = '/'
+        string $vHost = '/'
     ) {
         $this->host = $host;
         $this->port = $port;
         $this->user = $user;
         $this->password = $password;
-        $this->vhost = $vhost;
+        $this->vHost = $vHost;
     }
 
     public function getConnection(): AMQPStreamConnection
@@ -64,13 +53,13 @@ class AmqpConnection
                 $this->port,
                 $this->user,
                 $this->password,
-                $this->vhost
+                $this->vHost
             );
         }
         return $this->connection;
     }
 
-    public function getChannel($channelId = null): AMQPChannel
+    public function getChannel(?int $channelId = null): AMQPChannel
     {
         $index = $channelId ?: 'default';
         if (!\array_key_exists($index, $this->channels)) {
@@ -79,8 +68,13 @@ class AmqpConnection
         return $this->channels[$index];
     }
 
-    public function send($exchange, $routingKey, AmqpMessage $message, $type = self::TYPE_TOPIC, $channelId = null)
-    {
+    public function send(
+        string $exchange,
+        string $routingKey,
+        AmqpMessage $message,
+        string $type = self::TYPE_TOPIC,
+        ?int $channelId = null
+    ) {
         if ($type == self::TYPE_TOPIC) {
             $this->getChannel($channelId)->exchange_declare($exchange, $type, false, true, false);
         }

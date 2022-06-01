@@ -6,4 +6,5 @@ namespace Whirlwind\Queue;
 
 interface MessageInterface
 {
+    public function getBody(): string;
 }

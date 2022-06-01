@@ -10,23 +10,37 @@ use Whirlwind\Queue\QueueInterface;
 
 class Queue implements QueueInterface
 {
-    protected $amqpConnection;
+    protected AmqpConnection $connection;
 
-    protected $exchange;
+    protected string $name;
 
-    protected $routingKey;
+    protected string $exchange;
 
-    protected $type;
+    protected string $routingKey;
 
-    protected $channelId;
+    protected string $type;
 
-    public function __construct(AmqpConnection $amqpConnection, $exchange, $routingKey, $type, $channelId)
-    {
-        $this->amqpConnection = $amqpConnection;
+    protected ?int $channelId;
+
+    public function __construct(
+        AmqpConnection $connection,
+        string $name,
+        string $exchange,
+        string $routingKey,
+        string $type,
+        ?int $channelId = null
+    ) {
+        $this->connection = $connection;
+        $this->name = $name;
         $this->exchange = $exchange;
         $this->routingKey = $routingKey;
         $this->type = $type;
         $this->channelId = $channelId;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     public function push(MessageInterface $message)
@@ -34,7 +48,7 @@ class Queue implements QueueInterface
         if (!($message instanceof AmqpMessage)) {
             throw new InvalidArgumentException('Message must be of AmqpMessage type');
         }
-        $this->amqpConnection->send(
+        $this->connection->send(
             $this->exchange,
             $this->routingKey,
             $message,

@@ -8,15 +8,15 @@ use PhpAmqpLib\Message\AMQPMessage as BaseAMQPMessage;
 
 class AmqpListener
 {
-    protected $amqpConnection;
+    protected AmqpConnection $connection;
 
-    protected $queues;
+    protected array $queues;
 
-    protected $noAck;
+    protected bool $noAck;
 
-    public function __construct(AmqpConnection $amqpConnection, array $queues, bool $noAck = false)
+    public function __construct(AmqpConnection $connection, array $queues, bool $noAck = false)
     {
-        $this->amqpConnection = $amqpConnection;
+        $this->connection = $connection;
         foreach ($queues as $name => $worker) {
             $this->addQueue($name, $worker);
         }
@@ -37,32 +37,39 @@ class AmqpListener
         $this->listen($queueNames, [$this, 'callback'], $this->noAck);
     }
 
-    protected function listen(array $queueNames, callable $callback, $noAck = false)
+    protected function listen(array $queueNames, callable $callback, $noAck)
     {
         \array_map(function($queue) use ($callback, $noAck) {
-            $this->amqpConnection->getChannel()->basic_consume($queue, '', false, $noAck, false, false, $callback);
+            $this->connection->getChannel()->basic_consume(
+                $queue,
+                '',
+                false,
+                $noAck,
+                false,
+                false,
+                $callback
+            );
         }, $queueNames);
 
-        while (\count($this->amqpConnection->getChannel()->callbacks)) {
-            $this->amqpConnection->getChannel()->wait();
+        while (\count($this->connection->getChannel()->callbacks)) {
+            $this->connection->getChannel()->wait();
         }
 
-        $this->amqpConnection->getChannel()->close();
-        $this->amqpConnection->getChannel()->close();
+        $this->connection->getChannel()->close();
+        $this->connection->getChannel()->close();
     }
 
     public function callback(BaseAMQPMessage $msg)
     {
-        $routingKey = $msg->delivery_info['routing_key'];
+        $routingKey = $msg->getRoutingKey();
         if (!isset($this->queues[$routingKey])) {
             throw new \RuntimeException("Invalid routing key: $routingKey");
         }
         /** @var AmqpWorker $worker */
         $worker = $this->queues[$routingKey];
-        $worker->consume(
-            new AmqpMessage(\json_decode($msg->body, true)),
-            $msg->delivery_info['channel'],
-            $msg->delivery_info['delivery_tag']
-        );
+        $message = new AmqpMessage(\json_decode($msg->body, true));
+        $message->setChannel($msg->getChannel());
+        $message->setDeliveryTag($msg->getDeliveryTag());
+        $worker->consume($message);
     }
 }

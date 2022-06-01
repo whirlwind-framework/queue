@@ -19,4 +19,9 @@ class AmqpMessage extends BaseAMQPMessage implements MessageInterface
         }
         parent::__construct($body, $properties);
     }
+
+    public function getBody(): string
+    {
+        return (string)parent::getBody();
+    }
 }
