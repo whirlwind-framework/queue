@@ -10,7 +10,7 @@ class AmqpListener
 {
     protected AmqpConnection $connection;
 
-    protected array $queues;
+    protected array $queues = [];
 
     protected bool $noAck;
 
@@ -56,7 +56,7 @@ class AmqpListener
         }
 
         $this->connection->getChannel()->close();
-        $this->connection->getChannel()->close();
+        $this->connection->close();
     }
 
     public function callback(BaseAMQPMessage $msg)
