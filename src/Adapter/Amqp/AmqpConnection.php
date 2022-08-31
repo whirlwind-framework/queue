@@ -14,7 +14,7 @@ class AmqpConnection
     public const TYPE_HEADERS = 'headers';
     public const TYPE_FANOUT = 'fanout';
 
-    protected ?AMQPStreamConnection $connection;
+    protected ?AMQPStreamConnection $connection = null;
 
     /**
      * @var AMQPChannel[]
@@ -79,5 +79,12 @@ class AmqpConnection
             $this->getChannel($channelId)->exchange_declare($exchange, $type, false, true, false);
         }
         $this->getChannel($channelId)->basic_publish($message, $exchange, $routingKey);
+    }
+
+    public function close(): void
+    {
+        if (null !== $this->connection) {
+            $this->connection->close(...\func_get_args());
+        }
     }
 }
