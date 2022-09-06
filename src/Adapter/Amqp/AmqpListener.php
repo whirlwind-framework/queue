@@ -19,18 +19,18 @@ class AmqpListener
     {
         $this->connection = $connection;
         $this->queues = $queues;
-        foreach ($routingWorkers as $name => $worker) {
-            $this->addRouting($name, $worker);
+        foreach ($routingWorkers as $routingKey => $worker) {
+            $this->addRouting($routingKey, $worker);
         }
         $this->noAck = $noAck;
     }
 
-    protected function addRouting($name, $worker)
+    protected function addRouting($routingKey, $worker)
     {
         if (!($worker instanceof AmqpWorker)) {
             throw new \InvalidArgumentException('Worker must be instance of AmqpWorker');
         }
-        $this->routingWorkers[$name] = $worker;
+        $this->routingWorkers[$routingKey] = $worker;
     }
 
     public function run()
